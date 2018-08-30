@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  database:
+    image: mysql:5.7
+    container_name: mysql
+    volumes:
+      - ./back-end/data:/docker-entrypoint-initdb.d/
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  backend:
+    image: wordpress:4.9
+    container_name: backend
+    links:
+      - database
+    depends_on:
+      - database
+    privileged: true
+    ports:
+      - "8080:80"
+    volumes:
+      - ./back-end/wordpress:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: database:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      SITE_DOMAIN: 127.0.0.1:8080
+      WORDPRESS_ENV: develop
+      WORDPRESS_DEBUG: 1
+
+  frontend:
+    image: node:8
+    container_name: frontend
+    depends_on:
+      - backend
+    privileged: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./front-end:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+    environment:
+      NODE_ENV: development
+      WORDPRESS_PROTOCOL: http
+      WORDPRESS_HOST: 127.0.0.1:8080
+    working_dir: /usr/src/app
+    command: ["npm", "run", "dev:docker"]
+
+volumes:
+  node_modules:
+  db_data:
