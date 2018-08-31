@@ -6,18 +6,22 @@ const {
 
 module.exports = {
   siteMetadata: {
-    title: 'Gatsby Default Starter',
+    title: 'Henna and Face Paint by Ruby',
   },
   plugins: [
     'gatsby-plugin-react-helmet',
     {
       resolve: 'gatsby-source-wordpress',
       options: {
-        baseUrl: WORDPRESS_HOST,
-        hostingWPCOM: false,
-        protocol: WORDPRESS_PROTOCOL,
         useACF: true,
-        verboseOutput: !IS_PRODUCTION
+        hostingWPCOM: false,
+        baseUrl: WORDPRESS_HOST,
+        protocol: WORDPRESS_PROTOCOL,
+        verboseOutput: !IS_PRODUCTION,
+        excludedRoutes: [
+          // "!/acf/v3/**",
+          // "!/wp/v2/**"
+        ]
       },
     }
   ],
